@@ -1,5 +1,5 @@
 /** 
- * Arduino Library for JQ8400 MP3 Module
+ * Arduino Library for jq8400 MP3 Module
  * 
  * Copyright (C) 2019 James Sleeman, <http://sparks.gogo.co.nz/jq6500/index.html>
  * 
@@ -27,91 +27,91 @@
  */
 
 #include "mbed.h"
-#include "JQ8400_Serial.hpp"
+#include "jq8400.hpp"
 
-void  JQ8400_Serial::play() {
+void  jq8400::play() {
   this->sendCommand(MP3_CMD_PLAY);
 }
 
 
-void  JQ8400_Serial::restart() {
+void  jq8400::restart() {
   this->sendCommand(MP3_CMD_STOP); // Make sure really will restart
   this->sendCommand(MP3_CMD_PLAY);
 }
 
 
-void  JQ8400_Serial::pause() {
+void  jq8400::pause() {
   this->sendCommand(MP3_CMD_PAUSE);
 }
 
 
-void  JQ8400_Serial::stop() {
+void  jq8400::stop() {
   this->sendCommand(MP3_CMD_STOP);
 }
 
 
-void  JQ8400_Serial::next() {
+void  jq8400::next() {
   this->sendCommand(MP3_CMD_NEXT);
 }
 
 
-void  JQ8400_Serial::prev() {
+void  jq8400::prev() {
   this->sendCommand(MP3_CMD_PREV);
 }
 
 
-void  JQ8400_Serial::playFileByIndexNumber(int fileNumber) {  
+void  jq8400::playFileByIndexNumber(int fileNumber) {  
   // this->sendCommand(MP3_CMD_PLAY_IDX, (fileNumber>>8) & 0xFF, fileNumber & (int)0xFF);
   this->sendCommand(MP3_CMD_PLAY_IDX, fileNumber);
 }
 
 
-void  JQ8400_Serial::interjectFileByIndexNumber(int fileNumber) {  
+void  jq8400::interjectFileByIndexNumber(int fileNumber) {  
   int buf[3] = { getSource(), (int)((fileNumber>>8)&0xFF), (int)(fileNumber & (int)0xFF) };
   this->sendCommandData(MP3_CMD_INSERT_IDX, buf, 3, 0, 0);
 }
 
 
-void  JQ8400_Serial::seekFileByIndexNumber(int fileNumber) {  
+void  jq8400::seekFileByIndexNumber(int fileNumber) {  
   // this->sendCommand(MP3_CMD_SEEK_IDX, (fileNumber>>8) & 0xFF, fileNumber & (int)0xFF);
   this->sendCommand(MP3_CMD_SEEK_IDX, fileNumber);
 }
 
 
-void JQ8400_Serial::abLoopPlay(int secondsStart, int secondsEnd) {
+void jq8400::abLoopPlay(int secondsStart, int secondsEnd) {
   int buf[4] = { (int)(secondsStart / 60), (int)(secondsStart % 60), (int)(secondsEnd / 60), (int)(secondsEnd % 60) };
   this->sendCommandData(MP3_CMD_AB_PLAY, buf, sizeof(buf), 0, 0);
 }
 
 
-void JQ8400_Serial::abLoopClear() {
+void jq8400::abLoopClear() {
   this->sendCommand(MP3_CMD_AB_PLAY_STOP);
 }
 
 
-void JQ8400_Serial::fastForward(int seconds) {
+void jq8400::fastForward(int seconds) {
   //this->sendCommand(MP3_CMD_FFWD, (seconds>>8)&0xFF, seconds&0xFF);
   this->sendCommand(MP3_CMD_FFWD, seconds);
 }
 
 
-void JQ8400_Serial::rewind(int seconds) {
+void jq8400::rewind(int seconds) {
   //this->sendCommand(MP3_CMD_RWND, (seconds>>8)&0xFF, seconds&0xFF);
   this->sendCommand(MP3_CMD_RWND, seconds);
 }
 
 
-void  JQ8400_Serial::nextFolder() {
+void  jq8400::nextFolder() {
   this->sendCommand(MP3_CMD_NEXT_FOLDER);
 }
 
 
-void  JQ8400_Serial::prevFolder() {
+void  jq8400::prevFolder() {
   this->sendCommand(MP3_CMD_PREV_FOLDER);
 }
 
 
-void  JQ8400_Serial::playFileNumberInFolderNumber(int folderNumber, int fileNumber) {
+void  jq8400::playFileNumberInFolderNumber(int folderNumber, int fileNumber) {
   // This is kinda weird, the wildcard is *REQUIRED*, without it, it WILL NOT find the file you want.
   //
   // Really Weird.  Anyway this is the format for the data
@@ -152,7 +152,7 @@ void  JQ8400_Serial::playFileNumberInFolderNumber(int folderNumber, int fileNumb
 }
 
 
-void  JQ8400_Serial::playInFolderNumber(int folderNumber) {
+void  jq8400::playInFolderNumber(int folderNumber) {
   char buf[] = " /42*/*???";
   
   buf[0] = this->getSource();
@@ -172,7 +172,7 @@ void  JQ8400_Serial::playInFolderNumber(int folderNumber) {
 }
 
 
-void JQ8400_Serial::playSequenceByFileNumber(int playList[], int listLength) {
+void jq8400::playSequenceByFileNumber(int playList[], int listLength) {
   char buf[listLength*2+1]; // itoa will need an extra null
   
   int i = 0;
@@ -189,7 +189,7 @@ void JQ8400_Serial::playSequenceByFileNumber(int playList[], int listLength) {
 }
 
 
-void JQ8400_Serial::playSequenceByFileName(const char * playList[], int listLength) {
+void jq8400::playSequenceByFileName(const char * playList[], int listLength) {
   char buf[listLength*2];
   
   int i = 0;
@@ -203,57 +203,57 @@ void JQ8400_Serial::playSequenceByFileName(const char * playList[], int listLeng
 }
 
 
-void  JQ8400_Serial::volumeUp() {
+void  jq8400::volumeUp() {
   if(currentVolume < 30) currentVolume++;
   this->sendCommand(MP3_CMD_VOL_UP); // We still send the command just in case we got out of sync somehow
 }
 
 
-void  JQ8400_Serial::volumeDn() {
+void  jq8400::volumeDn() {
   if(currentVolume > 0 ) currentVolume--;
   this->sendCommand(MP3_CMD_VOL_DN); // We still send the command just in case we got out of sync somehow
 }
 
 
-void  JQ8400_Serial::setVolume(int volumeFrom0To30) {
+void  jq8400::setVolume(int volumeFrom0To30) {
   currentVolume = volumeFrom0To30;
   this->sendCommand(MP3_CMD_VOL_SET, volumeFrom0To30);
 }
 
 
-void  JQ8400_Serial::setEqualizer(int equalizerMode) {
+void  jq8400::setEqualizer(int equalizerMode) {
   currentEq = equalizerMode;
   this->sendCommand(MP3_CMD_EQ_SET, equalizerMode);
 }
 
-void  JQ8400_Serial::setLoopMode(int loopMode) {
+void  jq8400::setLoopMode(int loopMode) {
   currentLoop = loopMode;
   this->sendCommand(MP3_CMD_LOOP_SET, loopMode);
 }
 
 
-int JQ8400_Serial::getAvailableSources()  {
+int jq8400::getAvailableSources()  {
   return this->sendCommandWithintResponse(MP3_CMD_GET_SOURCES);
 }
 
 
-void  JQ8400_Serial::setSource(int source) {
+void  jq8400::setSource(int source) {
   this->sendCommand(MP3_CMD_SOURCE_SET, source);
 }
 
 
-int JQ8400_Serial::getSource()  {
+int jq8400::getSource()  {
   return this->sendCommandWithintResponse(MP3_CMD_GET_SOURCE);
 }
 
 
-void  JQ8400_Serial::sleep() {
+void  jq8400::sleep() {
   this->sendCommand(MP3_CMD_SLEEP);
   this->sendCommand(MP3_CMD_STOP);
 }
 
 
-void  JQ8400_Serial::reset() {
+void  jq8400::reset() {
   int retry = 5; // Try really hard to make ourselves heard.
   do {
     // The datasheet defined two stop commands but has no reset command
@@ -285,7 +285,7 @@ void  JQ8400_Serial::reset() {
 }
 
 
-int JQ8400_Serial::getStatus() {
+int jq8400::getStatus() {
       if(MP3_STATUS_CHECKS_IN_AGREEMENT <= 1) {
         return this->sendCommandWithintResponse(MP3_CMD_STATUS); 
       }
@@ -305,32 +305,32 @@ int JQ8400_Serial::getStatus() {
 }
 
 
-int  JQ8400_Serial::getVolume() { 
+int  jq8400::getVolume() { 
   return currentVolume; 
 }
 
 
-int  JQ8400_Serial::getEqualizer() { 
+int  jq8400::getEqualizer() { 
   return currentEq;
 }
 
 
-int  JQ8400_Serial::getLoopMode() {
+int  jq8400::getLoopMode() {
   return currentLoop;
 }
 
 
-int  JQ8400_Serial::countFiles() {
+int  jq8400::countFiles() {
   return this->sendCommandWithUnsignedIntResponse(MP3_CMD_COUNT_FILES); 
 }
 
 
-int  JQ8400_Serial::currentFileIndexNumber() {
+int  jq8400::currentFileIndexNumber() {
   return this->sendCommandWithUnsignedIntResponse(MP3_CMD_CURRENT_FILE_IDX); 
 }
 
 
-int  JQ8400_Serial::currentFilePositionInSeconds() {
+int  jq8400::currentFilePositionInSeconds() {
   int buf[3];
   // This turns on continuous position reporting, every second
   this->sendCommandData(MP3_CMD_CURRENT_FILE_POS, 0, 0, buf, 3);
@@ -340,7 +340,7 @@ int  JQ8400_Serial::currentFilePositionInSeconds() {
 }
 
 
-int JQ8400_Serial::currentFileLengthInSeconds() {
+int jq8400::currentFileLengthInSeconds() {
   int buf[3];
   this->sendCommandData(MP3_CMD_CURRENT_FILE_LEN, 0, 0, buf, 3);
   return (buf[0]*60*60) + (buf[1]*60) + buf[2];
@@ -348,27 +348,27 @@ int JQ8400_Serial::currentFileLengthInSeconds() {
 }
 
 
-void JQ8400_Serial::currentFileName(char *buffer, int bufferLength) {
+void jq8400::currentFileName(char *buffer, int bufferLength) {
   this->sendCommand(MP3_CMD_CURRENT_FILE_NAME, (int *)buffer, bufferLength);
   buffer[bufferLength-1] = 0; // Ensure null termination since this is a string.
 }
 
 
-int JQ8400_Serial::sendCommandWithUnsignedIntResponse(int command) {      
+int jq8400::sendCommandWithUnsignedIntResponse(int command) {      
   int buffer[4];
   this->sendCommand(command, buffer, sizeof(buffer));
   return ((int)buffer[0]<<8) | ((int)buffer[1]);
 }
 
 
-int JQ8400_Serial::sendCommandWithintResponse(int command) {
+int jq8400::sendCommandWithintResponse(int command) {
   int response = 0;
   this->sendCommand(command, &response, 1);
   return response;
 }
 
 
-void  JQ8400_Serial::sendCommandData(int command, int *requestBuffer, int requestLength, int *responseBuffer, int bufferLength) {
+void  jq8400::sendCommandData(int command, int *requestBuffer, int requestLength, int *responseBuffer, int bufferLength) {
       // Calculate the checksum which forms the end int
   int MP3_CHECKSUM = MP3_CMD_BEGIN + command + requestLength;
   for(int x = 0; x < requestLength; x++) {
@@ -376,15 +376,15 @@ void  JQ8400_Serial::sendCommandData(int command, int *requestBuffer, int reques
   }
   
   // If there is any random garbage on the line, clear that out now.
-  while(this->waitUntilAvailable(10)) this->_Serial->read();
+  while(this->waitUntilAvailable(10)) this->->read();
 
-  this->_Serial->putc(MP3_CMD_BEGIN);
-  this->_Serial->putc(command);
-  this->_Serial->putc(requestLength);
+  this->->putc(MP3_CMD_BEGIN);
+  this->->putc(command);
+  this->->putc(requestLength);
   for(int x = 0; x < requestLength; x++) {
-    this->_Serial->write(requestBuffer[x]);
+    this->->write(requestBuffer[x]);
   }
-  this->_Serial->putc(MP3_CHECKSUM);
+  this->->putc(MP3_CHECKSUM);
             
   if(responseBuffer && bufferLength) {
     memset(responseBuffer, 0, bufferLength);
@@ -404,7 +404,7 @@ void  JQ8400_Serial::sendCommandData(int command, int *requestBuffer, int reques
   int      j = 0;
   int      dataCount = 0;
   while(this->waitUntilAvailable(150)) {
-    j = this->_Serial->read();
+    j = this->->read();
     if(i == 2) {
       // The number of data ints to read
       dataCount = j;
@@ -451,13 +451,13 @@ void  JQ8400_Serial::sendCommandData(int command, int *requestBuffer, int reques
     
 
 // Waits until data becomes available, or a timeout occurs
-int JQ8400_Serial::waitUntilAvailable(int maxWaitTime)
+int jq8400::waitUntilAvailable(int maxWaitTime)
 {
   int c = 0;
   Timer startTime;
   startTime.start();
   do {
-    c = this->_Serial->available();
+    c = this->->available();
     if (c) {
       break;
       startTime.stop()

@@ -1,5 +1,5 @@
 /** 
- * Arduino Library for JQ8400 MP3 Module
+ * Arduino Library for jq8400 MP3 Module
  * 
  * Copyright (C) 2019 James Sleeman, <http://sparks.gogo.co.nz/jq6500/index.html>
  * 
@@ -26,8 +26,8 @@
  * @file
  */
 
-#ifndef JQ8400_h
-#define JQ8400_h
+#ifndef jq8400_h
+#define jq8400_h
 
     #define MP3_EQ_NORMAL           0
     #define MP3_EQ_POP              1
@@ -54,10 +54,10 @@
     #define MP3_DEBUG               0
     #define HEX_PRINT(a) if(a < 16) Serial.print(0); Serial.print(a, HEX);
 
-    class JQ8400_Serial : public Serial
+    class jq8400 : public Serial
     {        
     public: 
-        JQ8400_Serial(PinName _tx, PinName _rx) : Serial(_tx,_rx)
+        jq8400(PinName _tx, PinName _rx) : Serial(_tx,_rx)
 
         void    play();
         void    restart();
@@ -126,9 +126,9 @@
         int   sendCommandWithintResponse(int command);
         int   getAvailableSources();
         int   waitUntilAvailable(int maxWaitTime = 1000);
-        int   currentVolume = 20; ///< Record of current volume level (JQ8400 has no way to query)
-        int   currentEq     = 0;  ///< Record of current equalizer (JQ8400 has no way to query)
-        int   currentLoop   = 2;  ///< Record of current loop mode (JQ8400 has no way to query)
+        int   currentVolume = 20; ///< Record of current volume level (jq8400 has no way to query)
+        int   currentEq     = 0;  ///< Record of current equalizer (jq8400 has no way to query)
+        int   currentLoop   = 2;  ///< Record of current loop mode (jq8400 has no way to query)
 
         static const int MP3_CMD_BEGIN                    = 0xAA;        
         static const int MP3_CMD_PLAY                     = 0x02;
@@ -168,4 +168,4 @@
         static const int MP3_CMD_PLAYLIST                 = 0x1B;
     };
 
-#endif //JQ8400_h
+#endif //jq8400_h
