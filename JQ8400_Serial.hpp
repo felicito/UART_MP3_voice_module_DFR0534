@@ -63,109 +63,109 @@
         void    restart();
         void    pause();
         void    stop();
-        void    fastForward(uint16_t seconds = 5);
-        void    rewind(uint16_t seconds = 5);
+        void    fastForward(int seconds = 5);
+        void    rewind(int seconds = 5);
         void    next();
         void    prev();
         void    nextFolder();
         void    prevFolder();
-        void    playFileByIndexNumber(uint16_t fileNumber);        
-        void    interjectFileByIndexNumber(uint16_t fileNumber);        
-        void    playFileNumberInFolderNumber(uint16_t folderNumber, uint16_t fileNumber);
-        void    playInFolderNumber(uint16_t folderNumber);
-        void    seekFileByIndexNumber(uint16_t fileNumber);
-        void    abLoopPlay(uint16_t secondsStart, uint16_t secondsEnd);
+        void    playFileByIndexNumber(int fileNumber);        
+        void    interjectFileByIndexNumber(int fileNumber);        
+        void    playFileNumberInFolderNumber(int folderNumber, int fileNumber);
+        void    playInFolderNumber(int folderNumber);
+        void    seekFileByIndexNumber(int fileNumber);
+        void    abLoopPlay(int secondsStart, int secondsEnd);
         void    abLoopClear();
         void    volumeUp();
         void    volumeDn();
-        void    setVolume(byte volumeFrom0To30);
-        void    setEqualizer(byte equalizerMode); // EQ_NORMAL to EQ_BASS
-        void    setLoopMode(byte loopMode);
-        void    setSource(byte source);
-        uint8_t getSource();
-        uint8_t sourceAvailable(uint8_t source) {
+        void    setVolume(int volumeFrom0To30);
+        void    setEqualizer(int equalizerMode); // EQ_NORMAL to EQ_BASS
+        void    setLoopMode(int loopMode);
+        void    setSource(int source);
+        int getSource();
+        int sourceAvailable(int source) {
           return getAvailableSources() & 1<<source;
         }
         
         void    sleep();
         void    reset();
-        byte    getStatus();
-        uint8_t busy() { return getStatus() == MP3_STATUS_PLAYING; }
-        byte    getVolume();
-        byte    getEqualizer();
-        byte    getLoopMode();
-        uint16_t   countFiles();    
-        uint16_t   currentFileIndexNumber();
-        uint16_t   currentFilePositionInSeconds();
-        uint16_t   currentFileLengthInSeconds();
-        void       currentFileName(char *buffer, uint16_t bufferLength);    
-        void    playSequenceByFileNumber(uint8_t playList[], uint8_t listLength);
-        void    playSequenceByFileName(const char *playList[], uint8_t listLength);       
+        int    getStatus();
+        int busy() { return getStatus() == MP3_STATUS_PLAYING; }
+        int    getVolume();
+        int    getEqualizer();
+        int    getLoopMode();
+        int   countFiles();    
+        int   currentFileIndexNumber();
+        int   currentFilePositionInSeconds();
+        int   currentFileLengthInSeconds();
+        void       currentFileName(char *buffer, int bufferLength);    
+        void    playSequenceByFileNumber(int playList[], int listLength);
+        void    playSequenceByFileName(const char *playList[], int listLength);       
         
         
     protected:
-        void        sendCommandData(uint8_t command, uint8_t *requestBuffer, uint8_t requestLength, uint8_t *responseBuffer, uint8_t bufferLength);
-        inline void sendCommand(uint8_t command, uint8_t *responseBuffer = 0, uint8_t bufferLength = 0) { 
+        void        sendCommandData(int command, int *requestBuffer, int requestLength, int *responseBuffer, int bufferLength);
+        inline void sendCommand(int command, int *responseBuffer = 0, int bufferLength = 0) { 
           sendCommandData(command, NULL,  0, responseBuffer, bufferLength);
         }
 
-        inline void sendCommand(uint8_t command, uint8_t arg, uint8_t *responseBuffer = 0, uint8_t bufferLength = 0) { 
+        inline void sendCommand(int command, int arg, int *responseBuffer = 0, int bufferLength = 0) { 
         sendCommandData(command, &arg, 1, responseBuffer, bufferLength); 
         }
         
-        inline void sendCommand(uint8_t command, uint16_t arg, uint8_t *responseBuffer = 0, uint8_t bufferLength = 0) { 
-          #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__    
-              sendCommandData(command, ((uint8_t *)(&arg)), 2, responseBuffer, bufferLength);
+        inline void sendCommand(int command, int arg, int *responseBuffer = 0, int bufferLength = 0) { 
+          #if __int_ORDER__ == __ORDER_BIG_ENDIAN__    
+              sendCommandData(command, ((int *)(&arg)), 2, responseBuffer, bufferLength);
           #else
-              uint8_t buf[] = { *(((uint8_t *)(&arg))+1), *((uint8_t *)(&arg)) };
+              int buf[] = { *(((int *)(&arg))+1), *((int *)(&arg)) };
               sendCommandData(command, buf, 2, responseBuffer, bufferLength);
           #endif
         }
             
-        uint16_t  sendCommandWithUnsignedIntResponse(byte command);        
-        uint8_t   sendCommandWithByteResponse(uint8_t command);
-        uint8_t   getAvailableSources();
-        int       waitUntilAvailable(uint16_t maxWaitTime = 1000);
-        uint8_t   currentVolume = 20; ///< Record of current volume level (JQ8400 has no way to query)
-        uint8_t   currentEq     = 0;  ///< Record of current equalizer (JQ8400 has no way to query)
-        uint8_t   currentLoop   = 2;  ///< Record of current loop mode (JQ8400 has no way to query)
+        int   sendCommandWithUnsignedIntResponse(int command);        
+        int   sendCommandWithintResponse(int command);
+        int   getAvailableSources();
+        int   waitUntilAvailable(int maxWaitTime = 1000);
+        int   currentVolume = 20; ///< Record of current volume level (JQ8400 has no way to query)
+        int   currentEq     = 0;  ///< Record of current equalizer (JQ8400 has no way to query)
+        int   currentLoop   = 2;  ///< Record of current loop mode (JQ8400 has no way to query)
 
-        static const uint8_t MP3_CMD_BEGIN                    = 0xAA;        
-        static const uint8_t MP3_CMD_PLAY                     = 0x02;
-        static const uint8_t MP3_CMD_PAUSE                    = 0x03;
-        static const uint8_t MP3_CMD_FFWD                     = 0x23;
-        static const uint8_t MP3_CMD_RWND                     = 0x22;            
-        static const uint8_t MP3_CMD_STOP                     = 0x10; // Not sure, maybe 0x04?
-        static const uint8_t MP3_CMD_NEXT                     = 0x06;
-        static const uint8_t MP3_CMD_PREV                     = 0x05;
-        static const uint8_t MP3_CMD_PLAY_IDX                 = 0x07;
-        static const uint8_t MP3_CMD_SEEK_IDX                 = 0x1F;
-        static const uint8_t MP3_CMD_INSERT_IDX               = 0x16;
-        static const uint8_t MP3_CMD_AB_PLAY                  = 0x20;
-        static const uint8_t MP3_CMD_AB_PLAY_STOP             = 0x21;
-        static const uint8_t MP3_CMD_NEXT_FOLDER              = 0x0F;
-        static const uint8_t MP3_CMD_PREV_FOLDER              = 0x0E;
-        static const uint8_t MP3_CMD_PLAY_FILE_FOLDER         = 0x08;
-        static const uint8_t MP3_CMD_VOL_UP                   = 0x14;
-        static const uint8_t MP3_CMD_VOL_DN                   = 0x15;
-        static const uint8_t MP3_CMD_VOL_SET                  = 0x13;
-        static const uint8_t MP3_CMD_EQ_SET                   = 0x1A;
-        static const uint8_t MP3_CMD_LOOP_SET                 = 0x18;    
-        static const uint8_t MP3_CMD_SOURCE_SET               = 0x0B;
-        static const uint8_t MP3_CMD_SLEEP                    = 0x04;    // I am not sure about these, see implmentation of sleep() and reset()
-        static const uint8_t MP3_CMD_RESET                    = 0x04;    //  what I have done seems to work maybe, maybe.
-        static const uint8_t MP3_CMD_STATUS                   = 0x01;
-        static const uint8_t MP3_CMD_GET_SOURCES              = 0x09;
-        static const uint8_t MP3_CMD_GET_SOURCE               = 0x0A;
-        static const uint8_t MP3_CMD_COUNT_FILES              = 0x0C; 
-        static const uint8_t MP3_CMD_COUNT_IN_FOLDER          = 0x12; 
-        static const uint8_t MP3_CMD_CURRENT_FILE_IDX         = 0x0D; 
-        static const uint8_t MP3_CMD_FIRST_FILE_IN_FOLDER_IDX = 0x11; 
-        static const uint8_t MP3_CMD_CURRENT_FILE_LEN         = 0x24;
-        static const uint8_t MP3_CMD_CURRENT_FILE_POS         = 0x25; // This turns on continuous reporting of position
-        static const uint8_t MP3_CMD_CURRENT_FILE_POS_STOP    = 0x26; // This stops that
-        static const uint8_t MP3_CMD_CURRENT_FILE_NAME        = 0x1E;
-        static const uint8_t MP3_CMD_PLAYLIST                 = 0x1B;
+        static const int MP3_CMD_BEGIN                    = 0xAA;        
+        static const int MP3_CMD_PLAY                     = 0x02;
+        static const int MP3_CMD_PAUSE                    = 0x03;
+        static const int MP3_CMD_FFWD                     = 0x23;
+        static const int MP3_CMD_RWND                     = 0x22;            
+        static const int MP3_CMD_STOP                     = 0x10; // Not sure, maybe 0x04?
+        static const int MP3_CMD_NEXT                     = 0x06;
+        static const int MP3_CMD_PREV                     = 0x05;
+        static const int MP3_CMD_PLAY_IDX                 = 0x07;
+        static const int MP3_CMD_SEEK_IDX                 = 0x1F;
+        static const int MP3_CMD_INSERT_IDX               = 0x16;
+        static const int MP3_CMD_AB_PLAY                  = 0x20;
+        static const int MP3_CMD_AB_PLAY_STOP             = 0x21;
+        static const int MP3_CMD_NEXT_FOLDER              = 0x0F;
+        static const int MP3_CMD_PREV_FOLDER              = 0x0E;
+        static const int MP3_CMD_PLAY_FILE_FOLDER         = 0x08;
+        static const int MP3_CMD_VOL_UP                   = 0x14;
+        static const int MP3_CMD_VOL_DN                   = 0x15;
+        static const int MP3_CMD_VOL_SET                  = 0x13;
+        static const int MP3_CMD_EQ_SET                   = 0x1A;
+        static const int MP3_CMD_LOOP_SET                 = 0x18;    
+        static const int MP3_CMD_SOURCE_SET               = 0x0B;
+        static const int MP3_CMD_SLEEP                    = 0x04;    // I am not sure about these, see implmentation of sleep() and reset()
+        static const int MP3_CMD_RESET                    = 0x04;    //  what I have done seems to work maybe, maybe.
+        static const int MP3_CMD_STATUS                   = 0x01;
+        static const int MP3_CMD_GET_SOURCES              = 0x09;
+        static const int MP3_CMD_GET_SOURCE               = 0x0A;
+        static const int MP3_CMD_COUNT_FILES              = 0x0C; 
+        static const int MP3_CMD_COUNT_IN_FOLDER          = 0x12; 
+        static const int MP3_CMD_CURRENT_FILE_IDX         = 0x0D; 
+        static const int MP3_CMD_FIRST_FILE_IN_FOLDER_IDX = 0x11; 
+        static const int MP3_CMD_CURRENT_FILE_LEN         = 0x24;
+        static const int MP3_CMD_CURRENT_FILE_POS         = 0x25; // This turns on continuous reporting of position
+        static const int MP3_CMD_CURRENT_FILE_POS_STOP    = 0x26; // This stops that
+        static const int MP3_CMD_CURRENT_FILE_NAME        = 0x1E;
+        static const int MP3_CMD_PLAYLIST                 = 0x1B;
     };
 
 #endif //JQ8400_h

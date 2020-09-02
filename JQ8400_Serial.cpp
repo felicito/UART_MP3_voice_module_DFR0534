@@ -60,26 +60,26 @@ void  JQ8400_Serial::prev() {
 }
 
 
-void  JQ8400_Serial::playFileByIndexNumber(uint16_t fileNumber) {  
-  // this->sendCommand(MP3_CMD_PLAY_IDX, (fileNumber>>8) & 0xFF, fileNumber & (byte)0xFF);
+void  JQ8400_Serial::playFileByIndexNumber(int fileNumber) {  
+  // this->sendCommand(MP3_CMD_PLAY_IDX, (fileNumber>>8) & 0xFF, fileNumber & (int)0xFF);
   this->sendCommand(MP3_CMD_PLAY_IDX, fileNumber);
 }
 
 
-void  JQ8400_Serial::interjectFileByIndexNumber(uint16_t fileNumber) {  
-  uint8_t buf[3] = { getSource(), (uint8_t)((fileNumber>>8)&0xFF), (uint8_t)(fileNumber & (byte)0xFF) };
+void  JQ8400_Serial::interjectFileByIndexNumber(int fileNumber) {  
+  int buf[3] = { getSource(), (int)((fileNumber>>8)&0xFF), (int)(fileNumber & (int)0xFF) };
   this->sendCommandData(MP3_CMD_INSERT_IDX, buf, 3, 0, 0);
 }
 
 
-void  JQ8400_Serial::seekFileByIndexNumber(uint16_t fileNumber) {  
-  // this->sendCommand(MP3_CMD_SEEK_IDX, (fileNumber>>8) & 0xFF, fileNumber & (byte)0xFF);
+void  JQ8400_Serial::seekFileByIndexNumber(int fileNumber) {  
+  // this->sendCommand(MP3_CMD_SEEK_IDX, (fileNumber>>8) & 0xFF, fileNumber & (int)0xFF);
   this->sendCommand(MP3_CMD_SEEK_IDX, fileNumber);
 }
 
 
-void JQ8400_Serial::abLoopPlay(uint16_t secondsStart, uint16_t secondsEnd) {
-  uint8_t buf[4] = { (uint8_t)(secondsStart / 60), (uint8_t)(secondsStart % 60), (uint8_t)(secondsEnd / 60), (uint8_t)(secondsEnd % 60) };
+void JQ8400_Serial::abLoopPlay(int secondsStart, int secondsEnd) {
+  int buf[4] = { (int)(secondsStart / 60), (int)(secondsStart % 60), (int)(secondsEnd / 60), (int)(secondsEnd % 60) };
   this->sendCommandData(MP3_CMD_AB_PLAY, buf, sizeof(buf), 0, 0);
 }
 
@@ -89,13 +89,13 @@ void JQ8400_Serial::abLoopClear() {
 }
 
 
-void JQ8400_Serial::fastForward(uint16_t seconds) {
+void JQ8400_Serial::fastForward(int seconds) {
   //this->sendCommand(MP3_CMD_FFWD, (seconds>>8)&0xFF, seconds&0xFF);
   this->sendCommand(MP3_CMD_FFWD, seconds);
 }
 
 
-void JQ8400_Serial::rewind(uint16_t seconds) {
+void JQ8400_Serial::rewind(int seconds) {
   //this->sendCommand(MP3_CMD_RWND, (seconds>>8)&0xFF, seconds&0xFF);
   this->sendCommand(MP3_CMD_RWND, seconds);
 }
@@ -111,11 +111,11 @@ void  JQ8400_Serial::prevFolder() {
 }
 
 
-void  JQ8400_Serial::playFileNumberInFolderNumber(uint16_t folderNumber, uint16_t fileNumber) {
+void  JQ8400_Serial::playFileNumberInFolderNumber(int folderNumber, int fileNumber) {
   // This is kinda weird, the wildcard is *REQUIRED*, without it, it WILL NOT find the file you want.
   //
   // Really Weird.  Anyway this is the format for the data
-  //  the first byte is the source (as the byte value not ascii number)
+  //  the first int is the source (as the int value not ascii number)
   //  then slash separated path components, with a trailing wildcard fvor each one REQUIRED
   //  the basename of the file must have the wildcard also and the extention must be the 
   //  3 question mark character wildcards, you can't even match on ".mp3", damn this is weird
@@ -123,7 +123,7 @@ void  JQ8400_Serial::playFileNumberInFolderNumber(uint16_t folderNumber, uint16_
   char buf[] = " /42*/032*???";
   buf[0] = this->getSource();
   
-  uint8_t i = 2; // 1st digit folder component
+  int i = 2; // 1st digit folder component
   if(folderNumber<10) {
     buf[i] = '0';
     i++;
@@ -148,16 +148,16 @@ void  JQ8400_Serial::playFileNumberInFolderNumber(uint16_t folderNumber, uint16_
   
   buf[9] = '*'; // itoa clobbered this with it's null
   
-  this->sendCommandData(MP3_CMD_PLAY_FILE_FOLDER, (uint8_t*)buf, sizeof(buf)-1, 0, 0);
+  this->sendCommandData(MP3_CMD_PLAY_FILE_FOLDER, (int*)buf, sizeof(buf)-1, 0, 0);
 }
 
 
-void  JQ8400_Serial::playInFolderNumber(uint16_t folderNumber) {
+void  JQ8400_Serial::playInFolderNumber(int folderNumber) {
   char buf[] = " /42*/*???";
   
   buf[0] = this->getSource();
   
-  uint8_t i = 2; // 1st digit folder component
+  int i = 2; // 1st digit folder component
   if(folderNumber<10)
   {
     buf[i] = '0';
@@ -168,15 +168,15 @@ void  JQ8400_Serial::playInFolderNumber(uint16_t folderNumber) {
   i = 4;
   buf[i] = '*'; // itoa clobbered this with it's null
   
-  this->sendCommandData(MP3_CMD_PLAY_FILE_FOLDER, (uint8_t*)buf, sizeof(buf)-1, 0, 0);
+  this->sendCommandData(MP3_CMD_PLAY_FILE_FOLDER, (int*)buf, sizeof(buf)-1, 0, 0);
 }
 
 
-void JQ8400_Serial::playSequenceByFileNumber(uint8_t playList[], uint8_t listLength) {
+void JQ8400_Serial::playSequenceByFileNumber(int playList[], int listLength) {
   char buf[listLength*2+1]; // itoa will need an extra null
   
-  uint8_t i = 0;
-  for(uint8_t x = 0; x < listLength; x++)
+  int i = 0;
+  for(int x = 0; x < listLength; x++)
   {
     if(playList[x]<10)
     {
@@ -185,21 +185,21 @@ void JQ8400_Serial::playSequenceByFileNumber(uint8_t playList[], uint8_t listLen
     itoa(playList[x], &buf[i++], 10);
   }
   
-  this->sendCommandData(MP3_CMD_PLAYLIST, (uint8_t *)buf, sizeof(buf)-1, 0, 0);
+  this->sendCommandData(MP3_CMD_PLAYLIST, (int *)buf, sizeof(buf)-1, 0, 0);
 }
 
 
-void JQ8400_Serial::playSequenceByFileName(const char * playList[], uint8_t listLength) {
+void JQ8400_Serial::playSequenceByFileName(const char * playList[], int listLength) {
   char buf[listLength*2];
   
-  uint8_t i = 0;
-  for(uint8_t x = 0; x < listLength; x++)
+  int i = 0;
+  for(int x = 0; x < listLength; x++)
   {
     buf[i++] = playList[x][0];
     buf[i++] = playList[x][1];
   }
   
-  this->sendCommandData(MP3_CMD_PLAYLIST, (uint8_t *)buf, sizeof(buf), 0, 0);
+  this->sendCommandData(MP3_CMD_PLAYLIST, (int *)buf, sizeof(buf), 0, 0);
 }
 
 
@@ -215,35 +215,35 @@ void  JQ8400_Serial::volumeDn() {
 }
 
 
-void  JQ8400_Serial::setVolume(byte volumeFrom0To30) {
+void  JQ8400_Serial::setVolume(int volumeFrom0To30) {
   currentVolume = volumeFrom0To30;
   this->sendCommand(MP3_CMD_VOL_SET, volumeFrom0To30);
 }
 
 
-void  JQ8400_Serial::setEqualizer(byte equalizerMode) {
+void  JQ8400_Serial::setEqualizer(int equalizerMode) {
   currentEq = equalizerMode;
   this->sendCommand(MP3_CMD_EQ_SET, equalizerMode);
 }
 
-void  JQ8400_Serial::setLoopMode(byte loopMode) {
+void  JQ8400_Serial::setLoopMode(int loopMode) {
   currentLoop = loopMode;
   this->sendCommand(MP3_CMD_LOOP_SET, loopMode);
 }
 
 
-uint8_t JQ8400_Serial::getAvailableSources()  {
-  return this->sendCommandWithByteResponse(MP3_CMD_GET_SOURCES);
+int JQ8400_Serial::getAvailableSources()  {
+  return this->sendCommandWithintResponse(MP3_CMD_GET_SOURCES);
 }
 
 
-void  JQ8400_Serial::setSource(byte source) {
+void  JQ8400_Serial::setSource(int source) {
   this->sendCommand(MP3_CMD_SOURCE_SET, source);
 }
 
 
-uint8_t JQ8400_Serial::getSource()  {
-  return this->sendCommandWithByteResponse(MP3_CMD_GET_SOURCE);
+int JQ8400_Serial::getSource()  {
+  return this->sendCommandWithintResponse(MP3_CMD_GET_SOURCE);
 }
 
 
@@ -254,7 +254,7 @@ void  JQ8400_Serial::sleep() {
 
 
 void  JQ8400_Serial::reset() {
-  uint8_t retry = 5; // Try really hard to make ourselves heard.
+  int retry = 5; // Try really hard to make ourselves heard.
   do {
     // The datasheet defined two stop commands but has no reset command
     //  I have elected to make what looks more like "universal stop" 0x10
@@ -272,7 +272,7 @@ void  JQ8400_Serial::reset() {
     this->seekFileByIndexNumber(1);
     this->sendCommand(MP3_CMD_STOP);
     
-    uint8_t timeout = 9;
+    int timeout = 9;
     while(timeout-- > 0 ) {
       if(getAvailableSources()) {
         retry = 0;
@@ -285,17 +285,17 @@ void  JQ8400_Serial::reset() {
 }
 
 
-byte JQ8400_Serial::getStatus() {
+int JQ8400_Serial::getStatus() {
       if(MP3_STATUS_CHECKS_IN_AGREEMENT <= 1) {
-        return this->sendCommandWithByteResponse(MP3_CMD_STATUS); 
+        return this->sendCommandWithintResponse(MP3_CMD_STATUS); 
       }
       
-      byte statTotal = 0;
-      byte stat      = 0;
+      int statTotal = 0;
+      int stat      = 0;
       do {
         statTotal = 0;
-        for(byte x = 0; x < MP3_STATUS_CHECKS_IN_AGREEMENT; x++) {
-          stat = this->sendCommandWithByteResponse(MP3_CMD_STATUS);      
+        for(int x = 0; x < MP3_STATUS_CHECKS_IN_AGREEMENT; x++) {
+          stat = this->sendCommandWithintResponse(MP3_CMD_STATUS);      
           if(stat == 0) return 0; // STOP is fairly reliable
           statTotal += stat;
         }
@@ -305,33 +305,33 @@ byte JQ8400_Serial::getStatus() {
 }
 
 
-byte  JQ8400_Serial::getVolume() { 
+int  JQ8400_Serial::getVolume() { 
   return currentVolume; 
 }
 
 
-byte  JQ8400_Serial::getEqualizer() { 
+int  JQ8400_Serial::getEqualizer() { 
   return currentEq;
 }
 
 
-byte  JQ8400_Serial::getLoopMode() {
+int  JQ8400_Serial::getLoopMode() {
   return currentLoop;
 }
 
 
-uint16_t  JQ8400_Serial::countFiles() {
+int  JQ8400_Serial::countFiles() {
   return this->sendCommandWithUnsignedIntResponse(MP3_CMD_COUNT_FILES); 
 }
 
 
-uint16_t  JQ8400_Serial::currentFileIndexNumber() {
+int  JQ8400_Serial::currentFileIndexNumber() {
   return this->sendCommandWithUnsignedIntResponse(MP3_CMD_CURRENT_FILE_IDX); 
 }
 
 
-uint16_t  JQ8400_Serial::currentFilePositionInSeconds() {
-  uint8_t buf[3];
+int  JQ8400_Serial::currentFilePositionInSeconds() {
+  int buf[3];
   // This turns on continuous position reporting, every second
   this->sendCommandData(MP3_CMD_CURRENT_FILE_POS, 0, 0, buf, 3);
   // Stop it doing that
@@ -340,39 +340,39 @@ uint16_t  JQ8400_Serial::currentFilePositionInSeconds() {
 }
 
 
-uint16_t JQ8400_Serial::currentFileLengthInSeconds() {
-  uint8_t buf[3];
+int JQ8400_Serial::currentFileLengthInSeconds() {
+  int buf[3];
   this->sendCommandData(MP3_CMD_CURRENT_FILE_LEN, 0, 0, buf, 3);
   return (buf[0]*60*60) + (buf[1]*60) + buf[2];
   return 0; /* FIXME this->sendCommandWithUnsignedIntResponse(MP3_CMD_CURRENT_FILE_LEN_SEC); */ 
 }
 
 
-void JQ8400_Serial::currentFileName(char *buffer, uint16_t bufferLength) {
-  this->sendCommand(MP3_CMD_CURRENT_FILE_NAME, (uint8_t *)buffer, bufferLength);
+void JQ8400_Serial::currentFileName(char *buffer, int bufferLength) {
+  this->sendCommand(MP3_CMD_CURRENT_FILE_NAME, (int *)buffer, bufferLength);
   buffer[bufferLength-1] = 0; // Ensure null termination since this is a string.
 }
 
 
-uint16_t JQ8400_Serial::sendCommandWithUnsignedIntResponse(byte command) {      
-  uint8_t buffer[4];
+int JQ8400_Serial::sendCommandWithUnsignedIntResponse(int command) {      
+  int buffer[4];
   this->sendCommand(command, buffer, sizeof(buffer));
-  return ((uint8_t)buffer[0]<<8) | ((uint8_t)buffer[1]);
+  return ((int)buffer[0]<<8) | ((int)buffer[1]);
 }
 
 
-uint8_t JQ8400_Serial::sendCommandWithByteResponse(uint8_t command) {
-  uint8_t response = 0;
+int JQ8400_Serial::sendCommandWithintResponse(int command) {
+  int response = 0;
   this->sendCommand(command, &response, 1);
   return response;
 }
 
 
-void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, uint8_t requestLength, uint8_t *responseBuffer, uint8_t bufferLength) {
-      // Calculate the checksum which forms the end byte
-  uint8_t MP3_CHECKSUM = MP3_CMD_BEGIN + command + requestLength;
-  for(uint8_t x = 0; x < requestLength; x++) {
-    MP3_CHECKSUM += (uint8_t)requestBuffer[x];
+void  JQ8400_Serial::sendCommandData(int command, int *requestBuffer, int requestLength, int *responseBuffer, int bufferLength) {
+      // Calculate the checksum which forms the end int
+  int MP3_CHECKSUM = MP3_CMD_BEGIN + command + requestLength;
+  for(int x = 0; x < requestLength; x++) {
+    MP3_CHECKSUM += (int)requestBuffer[x];
   }
   
   // If there is any random garbage on the line, clear that out now.
@@ -381,7 +381,7 @@ void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, ui
   this->_Serial->putc(MP3_CMD_BEGIN);
   this->_Serial->putc(command);
   this->_Serial->putc(requestLength);
-  for(uint8_t x = 0; x < requestLength; x++) {
+  for(int x = 0; x < requestLength; x++) {
     this->_Serial->write(requestBuffer[x]);
   }
   this->_Serial->putc(MP3_CHECKSUM);
@@ -395,23 +395,22 @@ void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, ui
   // Allow some time for the device to process what we did and 
   // respond, up to 1 second, but typically only a few ms.
   this->waitUntilAvailable(1000);
-
             
   // The response format is the same as the command format
   //  AA [CMD] [DATA_COUNT] [B1..N] [SUM]
   MP3_CHECKSUM = 0;
       
-  uint8_t      i = 0;
-  uint8_t      j = 0;
-  uint8_t      dataCount = 0;
+  int      i = 0;
+  int      j = 0;
+  int      dataCount = 0;
   while(this->waitUntilAvailable(150)) {
     j = this->_Serial->read();
     if(i == 2) {
-      // The number of data bytes to read
+      // The number of data ints to read
       dataCount = j;
     }
         
-    // We only record the data bytes so bytes 0,1 and 2 are discarded
+    // We only record the data ints so ints 0,1 and 2 are discarded
     //   except for calculating checksum
     if(i <= 2) {
       MP3_CHECKSUM += j;
@@ -419,7 +418,7 @@ void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, ui
       continue;
     } else {
       if(dataCount > 0) {
-        // This is a databyte to read
+        // This is a dataint to read
         if((i-3) <= (bufferLength-1)) {
           responseBuffer[i-3] = j;
         }
@@ -427,7 +426,7 @@ void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, ui
         dataCount--;
         MP3_CHECKSUM += j;
       } else {
-        // This is the checksum byte
+        // This is the checksum int
         if((MP3_CHECKSUM & 0xFF) != j) {
           // Checksum Failed
           /* #if MP3_DEBUG
@@ -452,7 +451,7 @@ void  JQ8400_Serial::sendCommandData(uint8_t command, uint8_t *requestBuffer, ui
     
 
 // Waits until data becomes available, or a timeout occurs
-int JQ8400_Serial::waitUntilAvailable(uint16_t maxWaitTime)
+int JQ8400_Serial::waitUntilAvailable(int maxWaitTime)
 {
   int c = 0;
   Timer startTime;
